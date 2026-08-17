@@ -1,0 +1,32 @@
+name: docking
+channels:
+  - conda-forge
+
+dependencies:
+  # --- core ---
+  - python=3.12          # not 3.13/3.14 — meeko + vina bindings lag on newest Python
+  - pip
+
+  # --- cheminformatics / docking ---
+  - rdkit                # SMILES parsing, 3D conformers, descriptors, Lipinski
+  - openbabel            # file format conversion
+  - vina                 # AutoDock Vina + Python bindings
+  - gemmi                # structure file parsing (meeko dependency)
+
+  # --- structure handling ---
+  - biopython            # fetch + parse PDB files
+  - pymol-open-source    # visual verification of docking box placement
+
+  # --- data / ML ---
+  - numpy
+  - pandas
+  - scipy                # meeko dependency; also used by sklearn
+  - scikit-learn         # splits, metrics, baselines
+  - xgboost              # active-learning model
+  - matplotlib           # enrichment curves
+
+  # --- pip-only ---
+  # meeko is pure Python and conda-forge's build is years stale (imports the
+  # long-removed rdkit.six). PyPI has the current release.
+  - pip:
+      - meeko>=0.7

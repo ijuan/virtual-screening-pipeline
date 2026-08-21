@@ -34,6 +34,34 @@ def parse_hetatms(pdb_path) -> dict:
             parsed_hetatm.setdefault(residue_name,[]).append((x, y, z))
     return parsed_hetatm
 
+# Set of residue names that aren't in the ligand
+IGNORE = {"HOH", "GOL", "SO4", "PO4", "EDO", "PEG", "ACT",
+          "ZN", "NA", "MG", "CL", "CA", "K", "MN", "FE"}
+
+# Returns which residues are the actual drug
+def pick_ligand(hetatm: dict, min_atoms=10) -> str:
+    filtered_hetatm = []
+    for name, coords in hetatm.items():
+        if len(coords) < min_atoms:
+            continue
+        if name in IGNORE:
+            continue
+        filtered_hetatm.append(name)
+
+    if not filtered_hetatm:
+        raise ValueError(f"No ligand found - structure may be apo." 
+                            f" HETATM residues present: {list(hetatm)}")
+        
+    best = None
+    for name in filtered_hetatm:
+        if best is None or len(hetatm[name]) > len(hetatm[best]):
+            best = name
+    return best
+
+        
+
+    
+
 
 
 

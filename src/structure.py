@@ -45,26 +45,28 @@ IGNORE = {"HOH", "GOL", "SO4", "PO4", "EDO", "PEG", "ACT",
 # Returns which residues are the actual drug
 def pick_ligand(hetatm: dict, min_atoms=10, ligand=None) -> str:
     if ligand is not None:
-        if ligand not in hetatm:
-            raise ValueError(f"{ligand} not found. Present: {list(hetatm)}")
-        return ligand
+        key_matches = [k for k in hetatm if k[0] == ligand]
+        if not key_matches:
+            raise ValueError(f"{ligand} not found. Present: {sorted({k[0] for k in hetatm})}")
+        return sorted(key_matches)[0]
     filtered_hetatm = []
-    for name, coords in hetatm.items():
+    for key, coords in hetatm.items():
+        residue_name , chain, res_num = key
         if len(coords) < min_atoms:
             continue
-        if name in IGNORE:
+        if residue_name in IGNORE:
             continue
-        filtered_hetatm.append(name)
+        filtered_hetatm.append(key)
 
     if not filtered_hetatm:
         raise ValueError(f"No ligand found - structure may be apo." 
-                            f" HETATM residues present: {list(hetatm)}")
+                            f" HETATM residues present: {sorted({k[0] for k in hetatm})}")
         
-    best = None
+    best_candidate = None
     for name in filtered_hetatm:
-        if best is None or len(hetatm[name]) > len(hetatm[best]):
-            best = name
-    return best
+        if best_candidate is None or len(hetatm[name]) > len(hetatm[best_candidate]):
+            best_candidate = name
+    return best_candidate
 
 
 def compute_box(coords:list, padding=8.0) -> list:

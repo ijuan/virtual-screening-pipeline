@@ -87,10 +87,18 @@ def compute_box(coords:list, padding=8.0) -> list:
     return [center, size]
 
 
+def get_box_from_pdb(pdb_id, ligand=None):
+    """Find box wrapper"""
+    target_path = fetch_pdb(pdb_id)
+    hetam_dict = parse_hetatms(target_path)
+    ligand_key = pick_ligand(hetam_dict, ligand=ligand)
+    ligand_coords = hetam_dict[ligand_key]
+    return (ligand_key, compute_box(ligand_coords))
+
+
 
 
 
 
 if __name__ == "__main__":
-   x = compute_box([(0.639, 22.832, 7.09), (1.119, 22.308, 8.239), (0.248, 22.065, 9.241), (2.415, 22.022, 8.41), (3.34, 22.233, 7.433)])
-   print(x)
+    print(get_box_from_pdb("4LRH"))

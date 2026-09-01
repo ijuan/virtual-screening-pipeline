@@ -5,6 +5,8 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import Descriptors
 import csv
+from src.receptor import to_pdbqt
+import subprocess
 
 
 METALS = {"Zn", "Ca", "Na", "K", "Mg", "Fe", "Cu", "Mn", "Al", "Ga",
@@ -66,3 +68,19 @@ def is_dockable(smiles, max_mw=600.0):
     if Descriptors.MolWt(mol) > max_mw:
         return False
     return True
+
+
+def convert_library(sdf_dir, out_dir):
+    """Convert every SDF in sdf_dir to a flexible PDBQT. Returns (n_ok, n_failed)."""
+    failed = 0
+    ok = 0
+    for sdf_path in sdf_dir.glob("*.sdf"):
+        try:
+            out_path = out_dir / f"{sdf_path.stem}.pdbqt"
+            to_pdbqt(sdf_path, out_path, rigid=False)
+            ok += 1
+        except subprocess.CalledProcessError:
+            failed += 1
+        if (ok + failed) % 100 == 0:
+            print(f"Converted: {ok + failed}")
+    return (ok, failed)

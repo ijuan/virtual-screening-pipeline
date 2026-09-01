@@ -15,6 +15,7 @@ def extract_chain(pdb_path, chain, out_path):
         if (line.startswith("ATOM")) and (line[21] == chain):
             matching_list.append(line)
 
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w") as out_file:
         out_file.write("\n".join(matching_list))
-    return matching_list
+    return out_path

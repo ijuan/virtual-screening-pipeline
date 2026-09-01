@@ -24,6 +24,7 @@ dependencies:
   - scikit-learn         # splits, metrics, baselines
   - xgboost              # active-learning model
   - matplotlib           # enrichment curves
+  - requests
 
   # --- pip-only ---
   # meeko is pure Python and conda-forge's build is years stale (imports the

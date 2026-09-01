@@ -1,6 +1,7 @@
 import pathlib
 import requests
 
+
 def fetch_pdb(pdb_id, data_dir="data/structures"):
     pdb_id = pdb_id.upper()
     target_path = pathlib.Path(data_dir) / f"{pdb_id}.pdb"
@@ -41,6 +42,7 @@ def parse_hetatms(pdb_path) -> dict:
 IGNORE = {"HOH", "GOL", "SO4", "PO4", "EDO", "PEG", "ACT",
           "ZN", "NA", "MG", "CL", "CA", "K", "MN", "FE",
           "NAG", "BMA", "MAN", "FUC", "GAL", "SIA", "GLC"}
+
 
 # Returns which residues are the actual drug
 def pick_ligand(hetatm: dict, min_atoms=10, ligand=None) -> str:

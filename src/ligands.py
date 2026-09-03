@@ -9,9 +9,7 @@ from src.receptor import to_pdbqt
 import subprocess
 
 
-METALS = {"Zn", "Ca", "Na", "K", "Mg", "Fe", "Cu", "Mn", "Al", "Ga",
-          "As", "Se", "Xe", "Ag", "Au", "Pt", "Li", "Ba", "Bi", "Sb"
-          "He", "Ne", "Ar", "Kr", "Xe", "Rn",}
+ALLOWED_ELEMENTS = {"C", "N", "O", "S", "P", "F", "Cl", "Br", "I", "H"}
 
 
 def smiles_to_3d(smiles, out_path):
@@ -56,14 +54,14 @@ def prepare_library(csv_path, out_dir):
 
 
 def is_dockable(smiles, max_mw=600.0):
-    """True if the SMILES is a single, metal-free, reasonably sized organic molecule."""
+    """True if the SMILES is a single, made only of common elements, reasonably sized organic molecule."""
     if "." in smiles:
         return False
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         return False
     for atom in mol.GetAtoms():
-        if atom.GetSymbol() in METALS:
+        if atom.GetSymbol() not in ALLOWED_ELEMENTS:
             return False
     if Descriptors.MolWt(mol) > max_mw:
         return False

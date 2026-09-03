@@ -17,7 +17,7 @@ def fetch_chembl_approved(out_path, limit=1000):
         }
         library_csv = requests.get(url, params=params)
         if library_csv.status_code != 200:
-            raise ValueError("Could not fetch FDA library.")
+            raise ValueError(f"Could not fetch FDA library: {library_csv.status_code}")
         
         fda_data = library_csv.json()
 
@@ -27,7 +27,10 @@ def fetch_chembl_approved(out_path, limit=1000):
                 continue
             canonical_smiles = structures["canonical_smiles"]
             chembl_id = molecule["molecule_chembl_id"]
-            rows.append((chembl_id, canonical_smiles))
+            chembl_name = molecule["pref_name"]
+            if chembl_name is None:
+                chembl_name = ""
+            rows.append((chembl_name, chembl_id, canonical_smiles))
         if fda_data["page_meta"]["next"] is None:
             break
         offset += limit
@@ -35,7 +38,9 @@ def fetch_chembl_approved(out_path, limit=1000):
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", newline="") as file:
         writer = csv.writer(file)
-        writer.writerow(["chembl_id", "smiles"])
+        writer.writerow(["chembl_name", "chembl_id", "smiles"])
         writer.writerows(rows)
 
     return out_path
+
+

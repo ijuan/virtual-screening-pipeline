@@ -7,22 +7,21 @@ from rdkit import DataStructs
 from rdkit.Chem import AllChem
 from rdkit.Chem import Descriptors
 import csv
+from rdkit.Chem import rdFingerprintGenerator
 
-
+_MORGAN_GEN = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
 
 def featurize(smiles, n_bits=2048, radius=2):
     """Turn a SMILES string into a numeric feature vector. Returns None on invalid input."""
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         return None
-    mfp = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=n_bits)
-    arr = np.zeros(n_bits)
-    DataStructs.ConvertToNumpyArray(mfp, arr)
+    arr = _MORGAN_GEN.GetFingerprintAsNumPy(mol)
     desc = np.array([
-    Descriptors.MolWt(mol),
-    Descriptors.MolLogP(mol),
-    Descriptors.NumRotatableBonds(mol),
-    mol.GetNumHeavyAtoms(),
+        Descriptors.MolWt(mol),
+        Descriptors.MolLogP(mol),
+        Descriptors.NumRotatableBonds(mol),
+        mol.GetNumHeavyAtoms(),
     ])
     return np.concatenate([arr, desc])
 

@@ -3,7 +3,8 @@ import src.model as model
 import src.featurization as featurization
 import pandas as pd
 
-scores_csv = "data/results/scores.csv"
+TARGET = "folr1"
+scores_csv = f"data/results/{TARGET}/scores.csv"
 library_csv = "data/library/fda.csv"
 
 X, y, ids = featurization.build_dataset(scores_csv, library_csv)

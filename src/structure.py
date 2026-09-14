@@ -71,7 +71,7 @@ def pick_ligand(hetatm: dict, min_atoms=10, ligand=None) -> str:
     return best_candidate
 
 
-def compute_box(coords:list, padding=4.0) -> list:
+def compute_box(coords:list, padding=3.0) -> list:
     x_coords = [c[0] for c in coords]
     y_coords = [c[1] for c in coords]
     z_coords = [c[2] for c in coords]
@@ -96,10 +96,6 @@ def get_box_from_pdb(pdb_id, ligand=None):
     ligand_key = pick_ligand(hetam_dict, ligand=ligand)
     ligand_coords = hetam_dict[ligand_key]
     return (ligand_key, compute_box(ligand_coords))
-
-
-
-
 
 
 if __name__ == "__main__":

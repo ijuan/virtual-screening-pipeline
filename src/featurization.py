@@ -11,7 +11,7 @@ from rdkit.Chem import rdFingerprintGenerator
 
 _MORGAN_GEN = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
 
-def featurize(smiles, n_bits=2048, radius=2):
+def featurize(smiles):
     """Turn a SMILES string into a numeric feature vector. Returns None on invalid input."""
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:

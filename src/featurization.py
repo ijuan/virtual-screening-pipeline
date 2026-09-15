@@ -41,6 +41,9 @@ def build_dataset(scores_csv, library_csv):
         for row in reader:
             if not row["score"]:
                 continue
+            score = float(row["score"])
+            if score > 0:
+                continue
             featurization_smiles = featurize(smiles_by_id[row["chembl_id"]])
             if featurization_smiles is None:
                 continue

@@ -6,12 +6,14 @@ from sklearn.metrics import mean_absolute_error
 from xgboost import XGBRegressor
 
 
-def train_model(X_train, y_train, n_estimators=300, max_depth=6):
+def train_model(X_train, y_train, n_estimators=300, max_depth=6, random_state=42):
     """Train an XGBoost regressor on docking scores."""
     model = XGBRegressor(
-        n_estimators=n_estimators,
-        max_depth=max_depth,
-        random_state=42,
+    n_estimators=n_estimators,
+    max_depth=max_depth,
+    random_state=random_state,
+    subsample=0.8,
+    colsample_bytree=0.8,
     )
     model.fit(X_train, y_train)
     return model

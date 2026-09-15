@@ -3,9 +3,10 @@ import src.model as model
 import src.featurization as featurization
 import pandas as pd
 
-TARGET = "folr1"
+TARGET = "3ert"
 scores_csv = f"data/results/{TARGET}/scores.csv"
 library_csv = "data/library/fda.csv"
+print(f"TARGET={TARGET}  scores={scores_csv}")
 
 X, y, ids = featurization.build_dataset(scores_csv, library_csv)
 row_of = dict(zip(ids, range(len(ids))))

@@ -7,6 +7,7 @@ import src.featurization as featurization
 import numpy as np
 import explore.active_learning as active_learning
 from pathlib import Path
+from langgraph.graph import StateGraph, END
 
 
 class PipelineState(TypedDict):
@@ -24,6 +25,11 @@ class PipelineState(TypedDict):
     history: list
     receptor_dir: str      # "data/receptor"
     results_dir: str       # "data/results/3ert"
+    status: str
+    ligand_dir: str
+    library_csv: str
+    workers: int
+
 
 
 def find_box(state):
@@ -70,4 +76,39 @@ def active_learning_node(state):
         active_learning.select_uncertainty,
     )
     return {"history": history}
+
+
+RMSD_THRESHOLD = 2.0
+
+
+def gate_on_rmsd(state):
+    """Conditional edge: only screen if the redock validated."""
+    return "screen" if state["rmsd"] <= RMSD_THRESHOLD else "failed"
+
+
+def failed_node(state):
+    return {"status": f"redock failed validation: {state['rmsd']:.2f} A RMSD"}
+
+
+def build_graph():
+    g = StateGraph(PipelineState)
+
+    g.add_node("find_box", find_box)
+    g.add_node("prep_receptor", prep_receptor)
+    g.add_node("redock", redock_node)
+    g.add_node("screen", screen_node)
+    g.add_node("featurize", featurize_node)
+    g.add_node("active_learning", active_learning_node)
+    g.add_node("failed", failed_node)
+
+    g.set_entry_point("find_box")
+    g.add_edge("find_box", "prep_receptor")
+    g.add_edge("prep_receptor", "redock")
+    g.add_conditional_edges("redock", gate_on_rmsd)
+    g.add_edge("screen", "featurize")
+    g.add_edge("featurize", "active_learning")
+    g.add_edge("active_learning", END)
+    g.add_edge("failed", END)
+
+    return g.compile()
 

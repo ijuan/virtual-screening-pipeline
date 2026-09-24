@@ -49,9 +49,7 @@ def count_hits(y, rows, threshold=HIT_THRESHOLD):
     return int((y[rows] < threshold).sum())
 
 
-def run(strategy_fn, seed=42):
-    X, y, ids = featurization.build_dataset(SCORES_CSV, LIBRARY_CSV)
-
+def run_from_arrays(X, y, ids, strategy_fn, seed=42):
     rng = random.Random(seed)
     all_rows = list(range(len(ids)))
     rng.shuffle(all_rows)
@@ -77,6 +75,11 @@ def run(strategy_fn, seed=42):
         history.append((len(labeled), count_hits(y, labeled)))
 
     return history
+
+
+def run(strategy_fn, seed=42):
+    X, y, ids = featurization.build_dataset(SCORES_CSV, LIBRARY_CSV)
+    return run_from_arrays(X, y, ids, strategy_fn, seed)
 
 
 if __name__ == "__main__":

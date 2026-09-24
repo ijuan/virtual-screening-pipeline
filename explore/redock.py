@@ -6,20 +6,13 @@ import src.validate as validate
 from explore.prep_target import prepare_target
 
 
-def redock(pdb_id, chain, receptor_dir, out_path, exhaustiveness=8):
+def redock(receptor_pdbqt, ref_ligand_pdbqt, box, out_path, exhaustiveness=8):
     out_path = Path(out_path)
-    key, box = structure.get_box_from_pdb(pdb_id)
-    receptor_dir = Path(receptor_dir)
-    receptor = receptor_dir / f"{pdb_id}_{chain}.pdbqt"
-    ref_ligand = receptor_dir / f"{key[0]}_ref.pdbqt"
-
     center, size = box
-    score = dock.dock_one(receptor, ref_ligand, center, size, out_path, exhaustiveness)
-
-    docked_coords = validate.read_coords(out_path, first_model_only=True)
-    ref_coords = validate.read_coords(ref_ligand)
-
-    return score, validate.rmsd(docked_coords, ref_coords)
+    score = dock.dock_one(receptor_pdbqt, ref_ligand_pdbqt, center, size, out_path, exhaustiveness)
+    docked = validate.read_coords(out_path, first_model_only=True)
+    ref = validate.read_coords(ref_ligand_pdbqt)
+    return score, validate.rmsd(docked, ref)
 
 
 if __name__ == "__main__":
